@@ -1,39 +1,74 @@
 <!doctype html>
 <html ng-app="Eggly">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width">
-        <title>Eggly</title>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Eggly</title>
 
-        <link rel="stylesheet" href="assets/css/normalize.css">
-        <link rel="stylesheet" href="assets/css/eggly.css">
-        <link rel="stylesheet" href="assets/css/animations.css">
-        <link rel="stylesheet" href="vendor/bootstrap.min.css">
-    </head>
-    <body ng-controller="MainCtrl">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-sm-3 sidebar">
-                    <a href="#"><img class="logo" src="assets/img/eggly-logo.png"></a>
-                    <ul class="nav nav-sidebar">
-                        <li ng-repeat="category in categories"><a href="#">{{category.name}}</a></li>
-                    </ul>
-                </div>
-                <div class="col-sm-9 main">
-                    <div ng-repeat="bookmark in bookmarks">
-                        <button type="button" class="close">&times;</button>
-                        <button type="button" class="btn btn-link"><span class="glyphicon glyphicon-pencil"></span></button>
-                        <a href="#" target="_blank">{{bookmark.title}}</a>
-                    </div>
-                    <hr/>
-                </div>
-            </div>
-        </div>
+  <link rel="stylesheet" href="assets/css/normalize.css">
+  <link rel="stylesheet" href="assets/css/eggly.css">
+  <link rel="stylesheet" href="assets/css/animations.css">
+  <link rel="stylesheet" href="vendor/bootstrap.min.css">
+</head>
+<body ng-controller="MainCtrl">
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-3">
+      <a href="#" ng-click="setCurrentCategory(null)"><img class="logo" src="assets/img/eggly-logo.png"></a>
+      <ul class="nav nav-sidebar">
+        <li ng-repeat="category in categories" ng-class="{'active': isCurrentCategory(category)}">
+          <a href="javascript:void(0);" ng-click="setCurrentCategory(category)">{{category.name}}</a></li>
+      </ul>
+    </div>
+    <div class="col-sm-9 main">
+      <p>Selected category: {{currentCategory.name}}</p>
+      <div ng-repeat="bookmark in bookmarks | filter:{category: currentCategory.name}">
+        <button type="button" class="close">&times;</button>
+        <button type="button" class="btn btn-link" ng-click="startEditing(bookmark)"><span
+            class="glyphicon glyphicon-pencil"></span></button>
+        <a ng-href="{{bookmark.url}}" target="_blank">{{bookmark.title}}</a>
+      </div>
+      <hr/>
 
-        <script src="vendor/jquery.min.js"></script>
-        <script src="vendor/bootstrap.min.js"></script>
-        <script src="vendor/lodash.core.min.js"></script>
-        <script src="vendor/angular.min.js"></script>
-        <script src="app/eggly-app.js"></script>
-    </body>
+      <a href="javascript:void(0);" ng-click="startCreating()" ng-show="!isCreating && !isEditing">Create a bookmark</a>
+
+      <div>
+        <form class="edit-form" ng-show="isCreating || isEditing" ng-submit="submitForm()">
+          <p>{{isEditing ? 'Edit the bookmark' : 'Create new bookmark'}}</p>
+          <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" class="form-control" id="title" placeholder="Input book title"
+                   ng-model="formBookmark.title" required>
+          </div>
+          <div class="form-group">
+            <label for="url">Url</label>
+            <input type="text" class="form-control" id="url" placeholder="Input book url"
+                   ng-model="formBookmark.url" required>
+          </div>
+          <div class="form-group">
+            <label for="category">Category</label>
+            <select class="form-control"
+                    ng-model="formBookmark.category"
+                    ng-options="category.name as category.name for category in categories"
+                    id="category"
+                    required>
+              <option value="" disabled>Select category</option>
+            </select>
+          </div>
+          <div class="action-btns">
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="button" class="btn btn-default" ng-click="cancelForm()">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="vendor/jquery.min.js"></script>
+<script src="vendor/bootstrap.min.js"></script>
+<script src="vendor/lodash.core.min.js"></script>
+<script src="vendor/angular.min.js"></script>
+<script src="app/eggly-app.js"></script>
+</body>
 </html>
